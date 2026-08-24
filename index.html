@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Games — Инди-студия CyberBulliyng</title>
+    <!-- Подключаем иконки соцсетей (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0c10;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        a { color: #60a5fa; text-decoration: none; transition: 0.3s; }
+        a:hover { color: #93c5fd; }
+
+        /* Шапка */
+        header {
+            background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+            padding: 3rem 1rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #374151;
+        }
+        header h1 {
+            font-size: 2.8rem;
+            color: #f8fafc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        header .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        nav {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+        nav a {
+            background: #1e293b;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            border: 1px solid #334155;
+        }
+        nav a:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            text-decoration: none;
+        }
+
+        /* Общий контейнер */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Секции */
+        section {
+            margin-bottom: 3.5rem;
+        }
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #1e3a5f;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h2 i {
+            color: #3b82f6;
+        }
+
+        /* Сетка карточек игр */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+        }
+        .game-card {
+            background: #161b22;
+            border: 1px solid #2d3748;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+            border-color: #3b82f6;
+        }
+        .game-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            background: #1e293b; /* заглушка, если картинка не загрузилась */
+        }
+        .game-info {
+            padding: 1.2rem;
+        }
+        .game-info h3 {
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        .game-info p {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+            margin-left: 0.5rem;
+        }
+        .btn-outline:hover {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        /* Видео-блок */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 1rem;
+            border: 1px solid #2d3748;
+            margin: 1.5rem 0;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* О студии */
+        .about-studio {
+            background: #111827;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid #3b82f6;
+            font-style: italic;
+            color: #cbd5e1;
+        }
+
+        /* Соцсети и контакты */
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-links a {
+            background: #1e293b;
+            padding: 0.7rem 1.4rem;
+            border-radius: 2rem;
+            border: 1px solid #334155;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .social-links a:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #64748b;
+            border-top: 1px solid #1e293b;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка студии -->
+    <header>
+        <nav>
+            <a href="#released">🎮 Выпущенные игры</a>
+            <a href="#dev">🛠 В разработке</a>
+            <a href="#trailer">🎬 Трейлер</a>
+            <a href="#about">ℹ️ О студии</a>
+            <a href="#contact">📬 Контакты</a>
+        </nav>
+        <h1>Broken Games</h1>
+        <p class="subtitle">Инди-студия CyberBulliyng | Создаём игры с душой</p>
+    </header>
+
+    <div class="container">
+        <!-- Выпущенные игры -->
+        <section id="released">
+            <h2><i class="fas fa-gamepad"></i> Выпущенные игры</h2>
+            <div class="game-grid">
+                <!-- Карточка 1 (замени картинку и описание) -->
+                <div class="game-card">
+                    <img src="https://via.placeholder.com/400x200/1e293b/94a3b8?text=Screenshot+1" alt="Скриншот игры 1">
+                    <div class="game-info">
+                        <h3>Название игры 1</h3>
+                        <p>Краткое описание: мрачная головоломка от первого лица.</p>
+                        <a href="https://cyberbulliyng.itch.io/" class="btn" target="_blank">На Itch.io</a>
+                        <a href="#" class="btn btn-outline">Демо</a>
+                    </div>
+                </div>
+                <!-- Карточка 2 -->
+                <div class="game-card">
+                    <img src="https://via.placeholder.com/400x200/1e293b/94a3b8?text=Screenshot+2" alt="Скриншот игры 2">
+                    <div class="game-info">
+                        <h3>Название игры 2</h3>
+                        <p>Приключенческий платформер с уникальной механикой.</p>
+                        <a href="https://cyberbulliyng.itch.io/" class="btn" target="_blank">На Itch.io</a>
+                    </div>
+                </div>
+                <!-- Карточка 3 -->
+                <div class="game-card">
+                    <img src="https://via.placeholder.com/400x200/1e293b/94a3b8?text=Screenshot+3" alt="Скриншот игры 3">
+                    <div class="game-info">
+                        <h3>Название игры 3</h3>
+                        <p>Сюжетный хоррор. Время прохождения ~2 часа.</p>
+                        <a href="https://cyberbulliyng.itch.io/" class="btn" target="_blank">На Itch.io</a>
+                    </div>
+                </div>
+                <!-- Добавь ещё карточки по аналогии -->
+            </div>
+        </section>
+
+        <!-- Игры в разработке -->
+        <section id="dev">
+            <h2><i class="fas fa-code"></i> В разработке</h2>
+            <div class="game-grid">
+                <div class="game-card">
+                    <img src="https://via.placeholder.com/400x200/1e293b/f59e0b?text=WIP+1" alt="Концепт-арт 1">
+                    <div class="game-info">
+                        <h3>Проект X</h3>
+                        <p>Стелс-экшен в открытом мире. Релиз 2026.</p>
+                        <a href="#" class="btn">Следить</a>
+                    </div>
+                </div>
+                <div class="game-card">
+                    <img src="https://via.placeholder.com/400x200/1e293b/f59e0b?text=WIP+2" alt="Концепт-арт 2">
+                    <div class="game-info">
+                        <h3>Проект Y</h3>
+                        <p>Кооперативный survival. Альфа-тест скоро.</p>
+                        <a href="#" class="btn">Записаться</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Трейлер / видео -->
+        <section id="trailer">
+            <h2><i class="fas fa-video"></i> Трейлеры и геймплей</h2>
+            <div class="video-wrapper">
+                <!-- Замени src на свой трейлер с YouTube -->
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                    title="Трейлер игры" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <!-- О студии -->
+        <section id="about">
+            <h2><i class="fas fa-fire"></i> О студии</h2>
+            <div class="about-studio">
+                <p>«Я танцую с одиночеством. Музыка и мои движения заглушают весь шум плохих мыслей».</p>
+                <p style="margin-top:0.8rem">Я соло-разработчик CyberBulliyng, выпустила <strong>10 игр</strong> на основных площадках. Сейчас в активной разработке находятся <strong>3 проекта</strong>. Основной движок — Unity. Наша цель — создавать игры, которые вызывают эмоции и остаются в памяти.</p>
+            </div>
+        </section>
+
+        <!-- Ссылки и контакты -->
+        <section id="contact">
+            <h2><i class="fas fa-link"></i> Платформы</h2>
+            <div class="social-links">
+                <a href="https://cyberbulliyng.itch.io/" target="_blank"><i class="fab fa-itch-io"></i> Itch.io (CyberBulliyng)</a>
+                <!-- <a href="https://itch.io/c/4078532/developed-by-the-team" target="_blank"><i class="fas fa-users"></i> Разработано командой</a> -->
+                <a href="https://x.com/BrokenGamesO" target="_blank"><i class="fab fa-twitter"></i> Twitter (X)</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        © 2025 Broken Games — CyberBulliyng. All games and content belong to their respective owners.
+    </footer>
+</body>
+</html>
