@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выпущенные игры — Broken Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Все те же стили, что и в index.html + стили для каруселей и карточек */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0c10;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        a { color: #60a5fa; text-decoration: none; transition: 0.3s; }
+        a:hover { color: #93c5fd; }
+
+        header {
+            background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+            padding: 2rem 1rem 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #374151;
+            position: relative;
+        }
+        header h1 {
+            font-size: 2.8rem;
+            color: #f8fafc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        header .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        nav {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+        nav a {
+            background: #1e293b;
+            padding: 0.5rem 1.2rem;
+            border-radius: 5px;
+            font-weight: 500;
+            border: 1px solid #334155;
+        }
+        nav a:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        section {
+            margin-bottom: 3.5rem;
+        }
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #1e3a5f;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h2 i {
+            color: #3b82f6;
+        }
+
+        /* Карточки теперь идут в один столбец */
+        .game-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+        .game-card {
+            background: #161b22;
+            border: 1px solid #2d3748;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: row;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+            border-color: #3b82f6;
+        }
+
+        /* Блок скриншотов слева */
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            background: #1e293b;
+            width: 42%;
+            max-width: 420px;
+            flex-shrink: 0;
+            aspect-ratio: 16 / 10;
+        }
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.4s ease;
+            height: 100%;
+        }
+        .carousel-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            flex-shrink: 0;
+            display: block;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            padding: 0.3rem 0.7rem;
+            cursor: pointer;
+            z-index: 2;
+            border-radius: 0.3rem;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+        .carousel-btn:hover {
+            background: rgba(37, 99, 235, 0.8);
+        }
+        .carousel-btn.prev { left: 0.5rem; }
+        .carousel-btn.next { right: 0.5rem; }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.4rem;
+            z-index: 2;
+        }
+        .carousel-indicators .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .carousel-indicators .dot.active {
+            background: #3b82f6;
+        }
+
+        /* Блок с текстом и кнопками справа от карусели */
+        .game-info {
+            flex: 1;
+            padding: 1.5rem 1.8rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .game-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .game-text h3 {
+            color: #f1f5f9;
+            margin-bottom: 0.6rem;
+            font-size: 1.5rem;
+        }
+        .game-text p {
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+        .game-info .btn-group {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            width: 170px;
+        }
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .btn-outline:hover {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-links a {
+            background: #1e293b;
+            padding: 0.7rem 1.4rem;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .social-links a:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #64748b;
+            border-top: 1px solid #1e293b;
+            margin-top: 2rem;
+        }
+
+        /* Адаптив: на узких экранах карточка снова становится колонкой */
+        @media (max-width: 780px) {
+            .game-card { flex-direction: column; }
+            .carousel { width: 100%; max-width: none; aspect-ratio: 16 / 9; }
+            .game-info { flex-direction: column; align-items: stretch; }
+            .game-info .btn-group { width: 100%; flex-direction: row; }
+            .game-info .btn-group .btn { flex: 1; }
+        }
+        @media (max-width: 640px) {
+            .carousel-btn { font-size: 1.4rem; padding: 0.2rem 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="games.html">Выпущенные игры</a>
+            <a href="dev.html">В разработке</a>
+            <a href="trailers.html">Трейлеры</a>
+            <a href="index.html#about">О студии</a>
+        </nav>
+        <h1>Broken Games Studios</h1>
+        <p class="subtitle">Инди-студия CyberBulliyng | Создаём игры с душой</p>
+    </header>
+
+    <div class="container">
+        <section id="released">
+            <h2><i class="fas fa-gamepad"></i>Сделанные игры</h2>
+            <div class="game-grid">
+                <!-- Карточка 1 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM1MjU3NS8xNDg5NjQyMS5qcGc=/original/9oAnIz.jpg" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM1MjU3NS8xNDg5NjQyOC5wbmc=/original/x8%2FUsP.png" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM1MjU3NS8xNDg5NjQxOS5qcGc=/original/jMjb2x.jpg" alt="Скриншот 3">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM1MjU3NS8xNDg5NjQyOS5wbmc=/original/ZYC%2Fvi.png" alt="Скриншот 4">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>Zelle</h3>
+                            <p>Головоломка по созданию своего друга с нуля.</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://cyberbulliyng.itch.io/zelle" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-zelle" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 2 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM4ODQ1OC8xNDE0MTMyOS5wbmc=/794x1000/Sl34VG.png" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM4ODQ1OC8xNDE0MTEwMi5wbmc=/794x1000/ENuOfF.png" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM4ODQ1OC8xNDE0MTIwNy5wbmc=/794x1000/ePkFr5.png" alt="Скриншот 3">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjM4ODQ1OC8xNDE0MTEwMS5wbmc=/794x1000/6AEngl.png" alt="Скриншот 4">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>Life before my eys</h3>
+                            <p>Помоги девочке пережить сложный период жизни.</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://wirrwarr.itch.io/life-before-my-eyes" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-life-before-my-eyes" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 3 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1nLzE1ODI1MjAyLnBuZw==/315x250%23c/t2l7h8.png" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjY1NDI2NC8xNTgyODQyMy5naWY=/original/u4NL7A.gif" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjY1NDI2NC8xNTgyODY1Ny5naWY=/original/%2BwW2oa.gif" alt="Скриншот 3">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjY1NDI2NC8xNTgyODQ2My5naWY=/original/jZLx1Y.gif" alt="Скриншот 4">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>Exit 6</h3>
+                            <p>Платформер с превращениями. Разное тело для разных ситуаций.</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://wirrwarr.itch.io/exit-6" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-exit-6" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 4 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1nLzE3NjIxMzYwLnBuZw==/315x250%23c/3kkx6F.png" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjkzNjM4MC8xNzYyMTMxMC5qcGc=/794x1000/%2BCiL%2F6.jpg" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjkzNjM4MC8xNzYyMTMwOS5qcGc=/794x1000/41OKYQ.jpg" alt="Скриншот 3">
+                            <img src="https://img.itch.zone/aW1hZ2UvMjkzNjM4MC8xNzYyMTMwNi5qcGc=/794x1000/szXETk.jpg" alt="Скриншот 4">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>Garbage Genocide</h3>
+                            <p>Платформер с превращениями. Разное тело для разных ситуаций.</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://cyberbulliyng.itch.io/garbage-genocide" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-garbage-genocide" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 5 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1hZ2UvMzYzOTk1NS8yMTY1OTYxNS5wbmc=/794x1000/y1Pr46.png" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvMzYzOTk1NS8yMTY1OTYxNi5wbmc=/794x1000/IwtWDW.png" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvMzYzOTk1NS8yMTY1OTYxNC5wbmc=/794x1000/%2BGLIul.png" alt="Скриншот 3">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>Embers of the fallen City</h3>
+                            <p>Tower Defence с механикой сборки башен из разных деталей</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://cyberbulliyng.itch.io/ember-of-the-fallen-city" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-embers-of-the-fallen-city" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 6 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1nLzIzOTM0OTk3LmpwZw==/315x250%23c/tD7Q5b.jpg" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvNDAxMzAyMC8yMzkzNzQ3MC5wbmc=/794x1000/F2CEhB.png" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvNDAxMzAyMC8yMzkzNzQ3MS5wbmc=/794x1000/D16%2FN4.png" alt="Скриншот 3">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>Deep Knowledge</h3>
+                            <p>Копай руду и выполняй план компании</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://cyberbulliyng.itch.io/deep-knowledge" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-deep-knowledge" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 7 -->
+                <div class="game-card">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel-inner">
+                            <img src="https://img.itch.zone/aW1nLzI3MDQ5MzY2LnBuZw==/315x250%23c/NIQ9WO.png" alt="Скриншот 1">
+                            <img src="https://img.itch.zone/aW1hZ2UvNDUzODE5My8yNzA0OTM0Ni5wbmc=/794x1000/Dh%2FJ5W.png" alt="Скриншот 2">
+                            <img src="https://img.itch.zone/aW1hZ2UvNDUzODE5My8yNzA0OTM0NC5wbmc=/794x1000/W1urnm.png" alt="Скриншот 3">
+                        </div>
+                        <button class="carousel-btn prev" data-carousel-prev>❮</button>
+                        <button class="carousel-btn next" data-carousel-next>❯</button>
+                        <div class="carousel-indicators" data-carousel-indicators></div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-text">
+                            <h3>The Lavender Undertaker</h3>
+                            <p>Убей всей кто мешает твоему отдыху</p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="https://cyberbulliyng.itch.io/the-lavender-undertaker" class="btn" target="_blank">На Itch.io</a>
+                            <a href="trailers.html#trailer-lavender-undertaker" class="btn btn-outline">Смотреть трейлер</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2><i class="fas fa-link"></i> Контакты</h2>
+            <div class="social-links">
+                <a href="https://x.com/BrokenGamesStu" target="_blank"><i class="fab fa-x-twitter"></i> X</a>
+                <a href="https://cyberbulliyng.itch.io/" target="_blank"><i class="fab fa-itch-io"></i> Itch.io</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        © 2026 Broken Games Studios — CyberBulliyng. All games and content belong to their respective owners.
+    </footer>
+
+    <script>
+        (function() {
+            const carousels = document.querySelectorAll('[data-carousel]');
+            carousels.forEach(carousel => {
+                const inner = carousel.querySelector('.carousel-inner');
+                const images = inner.querySelectorAll('img');
+                const total = images.length;
+                if (total <= 1) {
+                    carousel.querySelector('.carousel-btn.prev').style.display = 'none';
+                    carousel.querySelector('.carousel-btn.next').style.display = 'none';
+                    carousel.querySelector('.carousel-indicators').style.display = 'none';
+                    return;
+                }
+                let currentIndex = 0;
+                const prevBtn = carousel.querySelector('[data-carousel-prev]');
+                const nextBtn = carousel.querySelector('[data-carousel-next]');
+                const indicatorsContainer = carousel.querySelector('[data-carousel-indicators]');
+                for (let i = 0; i < total; i++) {
+                    const dot = document.createElement('span');
+                    dot.classList.add('dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.dataset.index = i;
+                    dot.addEventListener('click', () => goTo(i));
+                    indicatorsContainer.appendChild(dot);
+                }
+                const dots = indicatorsContainer.querySelectorAll('.dot');
+                function updateCarousel() {
+                    inner.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentIndex));
+                }
+                function goTo(index) {
+                    if (index < 0) index = total - 1;
+                    if (index >= total) index = 0;
+                    currentIndex = index;
+                    updateCarousel();
+                }
+                prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+                nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+            });
+        })();
+    </script>
+</body>
+</html>

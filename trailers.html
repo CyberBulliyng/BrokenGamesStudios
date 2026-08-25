@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трейлеры — Broken Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0c10;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        a { color: #60a5fa; text-decoration: none; transition: 0.3s; }
+        a:hover { color: #93c5fd; }
+
+        header {
+            background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+            padding: 2rem 1rem 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #374151;
+            position: relative;
+        }
+        header h1 {
+            font-size: 2.8rem;
+            color: #f8fafc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        header .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        nav {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+        nav a {
+            background: #1e293b;
+            padding: 0.5rem 1.2rem;
+            border-radius: 5px;
+            font-weight: 500;
+            border: 1px solid #334155;
+        }
+        nav a:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        section {
+            margin-bottom: 3.5rem;
+        }
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #1e3a5f;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h2 i {
+            color: #3b82f6;
+        }
+
+        .trailer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+        .trailer-card {
+            background: #161b22;
+            border: 1px solid #2d3748;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            scroll-margin-top: 1.5rem; /* чтобы якорь не прятался под шапкой */
+        }
+        .trailer-card:hover {
+            border-color: #3b82f6;
+        }
+        .trailer-card.highlight {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.45), 0 12px 24px rgba(0,0,0,0.5);
+        }
+        .trailer-card .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #0a0c10;
+            cursor: pointer;
+        }
+        .trailer-card .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none; /* клик обрабатывает сам wrapper, чтобы открыть увеличенный просмотр */
+        }
+        .expand-hint {
+            position: absolute;
+            top: 0.7rem;
+            right: 0.7rem;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            z-index: 2;
+            transition: background 0.2s;
+        }
+        .video-wrapper:hover .expand-hint {
+            background: rgba(37, 99, 235, 0.85);
+        }
+        .trailer-card .trailer-info {
+            padding: 1rem 1.2rem;
+        }
+        .trailer-card .trailer-info h3 {
+            color: #f1f5f9;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+        .trailer-card .trailer-info p {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #64748b;
+            border-top: 1px solid #1e293b;
+            margin-top: 2rem;
+        }
+
+        /* Модальное окно с увеличенным трейлером */
+        .video-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 6, 9, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            z-index: 1000;
+        }
+        .video-modal.open {
+            display: flex;
+        }
+        .video-modal-content {
+            width: 100%;
+            max-width: 1100px;
+        }
+        .video-modal-content .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            border-radius: 0.6rem;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+        .video-modal-content .video-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+        .video-modal-title {
+            color: #f1f5f9;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .video-modal-close {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #f1f5f9;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .video-modal-close:hover {
+            background: #2563eb;
+        }
+
+        .social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-links a {
+            background: #1e293b;
+            padding: 0.7rem 1.4rem;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .social-links a:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        @media (max-width: 640px) {
+            .trailer-grid { grid-template-columns: 1fr; }
+            .video-modal { padding: 1.2rem 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="games.html">Выпущенные игры</a>
+            <a href="dev.html">В разработке</a>
+            <a href="trailers.html">Трейлеры</a>
+            <a href="index.html#about">О студии</a>
+        </nav>
+        <h1>Broken Games Studios</h1>
+        <p class="subtitle">Инди-студия CyberBulliyng | Создаём игры с душой</p>
+    </header>
+
+    <div class="container">
+        <section id="trailer">
+            <h2><i class="fas fa-video"></i> Трейлеры и геймплей</h2>
+            <div class="trailer-grid">
+
+                <div class="trailer-card" id="trailer-zelle" data-title="Zelle">
+                    <div class="video-wrapper" data-video-id="6LlJRfKD0JA">
+                        <iframe src="https://www.youtube-nocookie.com/embed/6LlJRfKD0JA?modestbranding=1"
+                                title="Zelle — геймплей"
+                                loading="lazy"></iframe>
+                        <div class="expand-hint"><i class="fas fa-expand"></i></div>
+                    </div>
+                    <div class="trailer-info">
+                        <h3>Zelle</h3>
+                        <p>Головоломка по созданию своего друга с нуля.</p>
+                    </div>
+                </div>
+
+                <div class="trailer-card" id="trailer-life-before-my-eyes" data-title="Life before my eys">
+                    <div class="video-wrapper" data-video-id="vlK1XNWYjvI">
+                        <iframe src="https://www.youtube-nocookie.com/embed/vlK1XNWYjvI?modestbranding=1"
+                                title="Life before my eys — трейлер"
+                                loading="lazy"></iframe>
+                        <div class="expand-hint"><i class="fas fa-expand"></i></div>
+                    </div>
+                    <div class="trailer-info">
+                        <h3>Life before my eys</h3>
+                        <p>Помоги девочке пережить сложный период жизни.</p>
+                    </div>
+                </div>
+
+                <div class="trailer-card" id="trailer-exit-6" data-title="Exit 6">
+                    <div class="video-wrapper" data-video-id="GU9I-ZQIcSo">
+                        <iframe src="https://www.youtube-nocookie.com/embed/GU9I-ZQIcSo?modestbranding=1"
+                                title="Exit 6 — геймплей"
+                                loading="lazy"></iframe>
+                        <div class="expand-hint"><i class="fas fa-expand"></i></div>
+                    </div>
+                    <div class="trailer-info">
+                        <h3>Exit 6</h3>
+                        <p>Платформер с превращениями. Разное тело для разных ситуаций.</p>
+                    </div>
+                </div>
+
+                <div class="trailer-card" id="trailer-garbage-genocide" data-title="Garbage Genocide">
+                    <div class="video-wrapper" data-video-id="ppfpgOdA7e0">
+                        <iframe src="https://www.youtube-nocookie.com/embed/ppfpgOdA7e0?modestbranding=1"
+                                title="Garbage Genocide — геймплей"
+                                loading="lazy"></iframe>
+                        <div class="expand-hint"><i class="fas fa-expand"></i></div>
+                    </div>
+                    <div class="trailer-info">
+                        <h3>Garbage Genocide</h3>
+                        <p>Платформер с превращениями. Разное тело для разных ситуаций.</p>
+                    </div>
+                </div>
+
+                <div class="trailer-card" id="trailer-object-zero" data-title="Escape from the first Room">
+                    <div class="video-wrapper" data-video-id="xfI2MexT4CE">
+                        <iframe src="https://www.youtube-nocookie.com/embed/xfI2MexT4CE?modestbranding=1"
+                                title="Escape from the first Room — геймплей"
+                                loading="lazy"></iframe>
+                        <div class="expand-hint"><i class="fas fa-expand"></i></div>
+                    </div>
+                    <div class="trailer-info">
+                        <h3>Escape from the first Room</h3>
+                        <p>Головоломка с элементами хоррора</p>
+                    </div>
+                </div>
+
+                <div class="trailer-card" id="trailer-deep-knowledge" data-title="Deep Knowledge">
+                    <div class="video-wrapper" data-video-id="RpJBN6BUT2w">
+                        <iframe src="https://www.youtube-nocookie.com/embed/RpJBN6BUT2w?modestbranding=1"
+                                title="Deep Knowledge — геймплей"
+                                loading="lazy"></iframe>
+                        <div class="expand-hint"><i class="fas fa-expand"></i></div>
+                    </div>
+                    <div class="trailer-info">
+                        <h3>Deep Knowledge</h3>
+                        <p>Копай руду и выполняй план компании.</p>
+                    </div>
+                </div>
+
+                
+
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2><i class="fas fa-link"></i> Контакты</h2>
+            <div class="social-links">
+                <a href="https://x.com/BrokenGamesStu" target="_blank"><i class="fab fa-x-twitter"></i> X</a>
+                <a href="https://cyberbulliyng.itch.io/" target="_blank"><i class="fab fa-itch-io"></i> Itch.io</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        © 2026 Broken Games Studios — CyberBulliyng. All games and content belong to their respective owners.
+    </footer>
+
+    <!-- Модальное окно для увеличенного просмотра трейлера -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-content">
+            <div class="video-modal-title">
+                <span id="videoModalTitle"></span>
+                <button class="video-modal-close" id="videoModalClose" aria-label="Закрыть">✕</button>
+            </div>
+            <div class="video-wrapper">
+                <iframe id="videoModalIframe" src="" title="Увеличенный просмотр трейлера" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const modal = document.getElementById('videoModal');
+            const modalIframe = document.getElementById('videoModalIframe');
+            const modalTitle = document.getElementById('videoModalTitle');
+            const modalClose = document.getElementById('videoModalClose');
+
+            function openModal(videoId, title) {
+                modalIframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&modestbranding=1';
+                modalTitle.textContent = title || '';
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('open');
+                modalIframe.src = ''; // останавливаем воспроизведение
+                document.body.style.overflow = '';
+            }
+
+            document.querySelectorAll('.trailer-card').forEach(card => {
+                const wrapper = card.querySelector('.video-wrapper');
+                const videoId = wrapper.dataset.videoId;
+                const title = card.dataset.title;
+                wrapper.addEventListener('click', () => openModal(videoId, title));
+            });
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+            });
+
+            // Если пришли по ссылке с якорем (например, с games.html#trailer-zelle) —
+            // прокручиваем к нужной карточке, подсвечиваем и сразу открываем в большом размере.
+            function handleHash() {
+                const id = window.location.hash.replace('#', '');
+                if (!id) return;
+                const card = document.getElementById(id);
+                if (!card) return;
+
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('highlight');
+                setTimeout(() => card.classList.remove('highlight'), 2200);
+
+                const wrapper = card.querySelector('.video-wrapper');
+                const videoId = wrapper.dataset.videoId;
+                const title = card.dataset.title;
+                setTimeout(() => openModal(videoId, title), 400);
+            }
+
+            window.addEventListener('DOMContentLoaded', handleHash);
+            window.addEventListener('hashchange', handleHash);
+        })();
+    </script>
+</body>
+</html>
